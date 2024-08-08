@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(leaflet)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -16,8 +17,8 @@ ui <- fluidPage(
     titlePanel("MNO Water Sampling Sites"),
 
     # Sidebar with a slider input for number of bins 
-    mainPanel(leafletOutput("mymap")
-              )
+   leafletOutput("mymap")
+              
     
 )
 

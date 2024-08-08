@@ -65,23 +65,48 @@ m2
 #renv::install("htmltools")
 library(htmltools)
 
-sites <- read.csv("allSites.csv")
+sites <- read.csv("allSites.csv", stringsAsFactors = TRUE)
+sites$Region<- as.factor(sites$Region)
 
-customMarker <- makeAwesomeIcon(
-  icon = "chat-message",
-  library = "glyphicon",
+markers <- makeAwesomeIcon(
   markerColor = "darkblue",
-  iconColor = "white",
-  text = sites$Site)
+  iconColor= "white",
+  text = sites$Site
+)
+
+markers <- awesomeIconList(
+  "wq" = makeAwesomeIcon(
+    icon = "chat-message",
+    library = "glyphicon",
+    markerColor = "darkblue",
+    iconColor = "white",
+    text = sites$Site),
+  "baitfish"  = makeAwesomeIcon(
+    icon = "chat-message",
+    library = "glyphicon",
+    markerColor = "darkred",
+    iconColor = "white",
+    text = sites$Site)
+)
 
 #With marker that has site number and shows name on hover
 m4 <- leaflet() |> 
   setView(lng = -81.44, 
           lat = 48.20, 
           zoom = 5) |> 
-  addProviderTiles("CartoDB.Positron")  |> 
-  addAwesomeMarkers(data = sites, icon = customMarker, lng=sites$Long, lat=sites$Lat, label = sites$Name)
+  addProviderTiles("CartoDB.Positron", group = "Positron (minimal)")  |> 
+  addProviderTiles(providers$Esri.WorldImagery, group = "World Imagery (satellite)") |>
+  addAwesomeMarkers(data = sites, icon = markers, lng=sites$Long, lat=sites$Lat, label = sites$Name) |>
+   addLayersControl(
+    baseGroups = c(
+      "Positron (default)",
+      "World Imagery (satellite)"
+    )
+  )
 m4
 
+
+
+  
 
 ```
