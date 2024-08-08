@@ -1,0 +1,87 @@
+---
+title: "map"
+author: "Jean Richardson"
+date: "2024-07-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(tidyverse)
+require(knitr)
+require(tmap)
+require(shiny)
+library(sf)
+library(terra)
+library(dplyr)
+library(spData)
+library(spDataLarge)
+library(tmap)
+library(leaflet)
+library(ggplot2)
+
+```
+
+```{r enviro, include=FALSE}
+renv::snapshot()
+renv::restore()
+renv::install()
+renv::update()
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r maps}
+on.map <- sf::st_read("Province/Province.shp")
+on.aq.poly <- sf::st_read("Aquatic_resource_area_polygon_segment_/Aquatic_resource_area_polygon_segment_.shp")
+on.utm <- sf::st_read("UTM_(Universal_Transverse_Mercator)_10_Km_Grid/UTM_(Universal_Transverse_Mercator)_10_Km_Grid.shp")
+samples <- sf::st_read("MNOsampling.kmz")
+
+prov <- ggplot(data=on.map) + geom_sf()
+prov + ggplot(data=on.aq.poly) + geom_sf()
+
+crs(on.map)
+
+st_is_longlat(on.map)
+
+
+```
+
+
+
+```{r mapping}
+library(leaflet)
+m2 <- leaflet() |> 
+  setView(lng = -81.44, 
+          lat = 48.20, 
+          zoom = 5) |> 
+  addTiles()
+m2
+
+#renv::install("htmltools")
+library(htmltools)
+
+sites <- read.csv("allSites.csv")
+
+customMarker <- makeAwesomeIcon(
+  icon = "chat-message",
+  library = "glyphicon",
+  markerColor = "darkblue",
+  iconColor = "white",
+  text = sites$Site)
+
+#With marker that has site number and shows name on hover
+m4 <- leaflet() |> 
+  setView(lng = -81.44, 
+          lat = 48.20, 
+          zoom = 5) |> 
+  addProviderTiles("CartoDB.Positron")  |> 
+  addAwesomeMarkers(data = sites, icon = customMarker, lng=sites$Long, lat=sites$Lat, label = sites$Name)
+m4
+
+
+```
